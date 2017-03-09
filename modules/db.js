@@ -1,6 +1,6 @@
-module.exports = (function () {
+module.exports = function (deps) {
 
-  var config = require('./../config/config.js');
+  var config = deps.config;
   var firebase = require('firebase');
 
   this.connect = function (cred) {
@@ -83,4 +83,4 @@ module.exports = (function () {
   };
 
   return this;
-})();
+};
