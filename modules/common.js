@@ -4,4 +4,5 @@ module.exports = {
   util: require('./common/util'),
   db: require('./common/db'),
   crawl: require('./common/crawl'),
+  ajax: require('./common/ajax'),
 };

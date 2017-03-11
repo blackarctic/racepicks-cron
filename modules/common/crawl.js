@@ -1,15 +1,37 @@
 module.exports = {
 
+  getLiveJsonUrl: function (deps, race) {
+    return new Promise((resolve, reject) => {
+      try {
+        if (race && race.liveJsonUrl) {
+          resolve(race.liveJsonUrl);
+        }
+        else {
+          const config = deps.config;
+          const Nightmare = deps.Nightmare;
+          Nightmare({show: false})
+          .goto(config.endpoints.nascar.racecenter)
+          .evaluate(() => { return liveRaceURL; })
+          .end()
+          .then(resolve)
+          .catch(reject);
+        }
+      }
+      catch (e) { reject(e); }
+    });
+  },
+
   getRaceInfo: function (deps) {
     return new Promise((resolve, reject) => {
       try {
+        const config = deps.config;
         const common = deps.common;
         const Nightmare = deps.Nightmare;
 
         let race = common.defaults.race();
 
         Nightmare({show: false})
-        .goto('https://racing.fantasysports.yahoo.com/auto/playerdistribution')
+        .goto(config.endpoints.yahoo.playerdistribution)
         .inject('js', './node_modules/jquery/dist/jquery.min.js')
         .evaluate((race) => {
 
@@ -44,7 +66,7 @@ module.exports = {
         .then(race => {
 
           Nightmare({show: false})
-          .goto('http://www.nascar.com/racecenter.html')
+          .goto(config.endpoints.nascar.racecenter)
           .inject('js', './node_modules/jquery/dist/jquery.min.js')
           .evaluate((race) => {
 

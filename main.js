@@ -5,12 +5,13 @@
   const logger = require('./modules/logger')({config});
   const common = require('./modules/common');
 
+  const axios = require('axios');
   const Nightmare = require('nightmare');
 
-  const deps = {config, db, logger, common, Nightmare};
+  const deps = {config, db, logger, common, axios, Nightmare};
 
-  const createRace = require('./scripts/create.js');
-  //const monitorRace = require('./scripts/monitor.js');
+  const createRace = require('./modules/action/create.js');
+  const monitorRace = require('./modules/action/monitor.js');
 
   try {
 
@@ -38,10 +39,10 @@
         }
 
         // otherwise, if the latest race is finished
-        else if (latestRace.live && latestRace.live.laps_to_go === 0 && latestRace.live.flag_state === 9) {
+        else if (latestRace.timestamps.finished || (latestRace.live && latestRace.live.laps_to_go === 0 && latestRace.live.flag_state === 9)) {
           
           // if the latest race is marked as finished
-          if (latestRace.finished) {
+          if (latestRace.timestamps.finished) {
             // create the race
             let prevRace = latestRace;
             createRace(deps, conn, prevRace)
@@ -52,20 +53,21 @@
           // if the latest race is not marked as finished
           else {
             // mark the race as finished
-            let key = `/races/${latestRace.id}/timestamps/finished`;
-            db.set(conn, key, Date.now())
-            .then(data => { logger.info('race marked as finished', data); cycle(conn, THREE_DAYS); })
+            common.db.markRaceAsFinished(deps, conn, {race: latestRace})
+            .then(data => {
+              if (!data.alreadyExists) { logger.info('race marked as finished', data); }
+              cycle(conn, THREE_DAYS);
+            })
             .catch(e => { logger.error(e); cycle(conn, TWENTY_FOUR_HOURS); });
           }
         }
 
         // otherwise, if the race is started 
-        else if (latestRace.timestamps.start && Date.now() > latestRace.timestamps.start) {
+        else if (latestRace.timestamps.started || (latestRace.timestamps.start && Date.now() > latestRace.timestamps.start)) {
           // if not marked, mark the race as started
-          let key = `/races/${latestRace.id}/timestamps/started`;
-          db.set(conn, key, Date.now())
+          common.db.markRaceAsStarted(deps, conn, {race: latestRace})
           .then(data => {
-            logger.info('race marked as started', data);
+            if (!data.alreadyExists) { logger.info('race marked as started', data); }
             // monitor the race
             monitorRace(deps, conn, latestRace)
             .then(data => { logger.info('begun monitoring race', data); cycle(conn, ONE_SECOND); })
@@ -73,8 +75,9 @@
           })
           .catch(e => { logger.error(e); cycle(conn, FIVE_MINUTES); });
         }
-
-        cycle(conn, ONE_MINUTE);
+        else {
+          cycle(conn, ONE_MINUTE);
+        }
         
       })
       .catch(e => { logger.exit.error(e); });
@@ -85,7 +88,7 @@
       setTimeout(() => { logger.debug(`running cycle after ${delay/1000} s`); main(conn); }, delay);
     }
 
-    db.connect(config.firebase)
+    db.connect(config.server.firebase)
     .then(conn => { logger.debug('connected to firebase db'); cycle(conn, 0); })
     .catch(e => { logger.exit.error(e); });
 

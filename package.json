@@ -4,7 +4,13 @@
   "description": "",
   "main": "",
   "scripts": {
-    "start": "DEBUG=Rollbar:* node main.js",
+    "start": "npm run main",
+    "main": "node main.js",
+    "wipe": "node scripts/wipe.js",
+    "set": "node scripts/set.js",
+    "get-drivers": "node scripts/get-drivers.js",
+    "get-lap": "node scripts/get-lap.js",
+    "start-and-log-rollbar": "DEBUG=Rollbar:* node main.js",
     "test": "mocha"
   },
   "author": "",

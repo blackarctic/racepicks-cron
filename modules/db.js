@@ -6,7 +6,7 @@ module.exports = function (deps) {
   this.connect = function (cred) {
     return new Promise(function (resolve, reject) {
       try {
-        var conn = firebase.initializeApp(config.firebase.config).database();
+        var conn = firebase.initializeApp(config.server.firebase.config).database();
         firebase.auth().signInWithEmailAndPassword(cred.email, cred.password)
         .then(function () { resolve(conn); })
         .catch(function (e) { reject(e); });
@@ -19,6 +19,17 @@ module.exports = function (deps) {
     return new Promise(function (resolve, reject) {
       try {
         db.ref(key).once('value')
+        .then(function (response) { resolve(response); })
+        .catch(function (e) { reject(e); });
+      }
+      catch (e) { reject(e); }
+    });
+  };
+
+  this.getAndOrderByChildAndLimitToLast = function (db, key, childKey, limit) {
+    return new Promise(function (resolve, reject) {
+      try {
+        db.ref(key).orderByChild(childKey).limitToLast(limit).once('value')
         .then(function (response) { resolve(response); })
         .catch(function (e) { reject(e); });
       }

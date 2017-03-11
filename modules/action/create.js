@@ -13,7 +13,7 @@ module.exports = function (deps, conn, prevRace) {
         let raceId;
         if (!prevRace) { raceId = 1; }
         else if (!common.util.isSameRace(prevRace, race)) { raceId = prevRace.id + 1; }
-        else { reject(new Error(`race not created. race already exists (${race.name} @ ${race.track})`)); }
+        else { throw new Error(`race not created. race already exists (${race.name} @ ${race.track})`); }
 
         // only grab the drivers who have numbers
         race.drivers.all = race.drivers.all.filter(function (driver) { return driver.num !== ''; });
