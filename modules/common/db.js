@@ -11,6 +11,7 @@ module.exports = {
             if (race) { resolve(race); }
             else { resolve(null); }
           });
+          resolve(null);
         }).catch(reject);
       }
       catch (e) { reject(e); }
@@ -61,7 +62,7 @@ module.exports = {
           let raceId = metadata.race.id;
           if (!raceId) { throw new Error('No valid race ID provided'); }
           let key = `/races/${raceId}/liveJsonUrl`;
-          db.set(conn, key, data).then(resolve).catch(reject);
+          db.set(conn, key, data).then(() => { resolve({}); }).catch(reject);
         }
       }
       catch (e) { reject(e); }
@@ -78,7 +79,7 @@ module.exports = {
           let raceId = metadata.race.id;
           if (!raceId) { throw new Error('No valid race ID provided'); }
           let key = `/races/${raceId}/timestamps/started`;
-          db.set(conn, key, Date.now()).then(resolve).catch(reject);          
+          db.set(conn, key, Date.now()).then(() => { resolve({}); }).catch(reject);          
         }
       }
       catch (e) { reject(e); }
@@ -94,8 +95,8 @@ module.exports = {
           const db = deps.db;
           let raceId = metadata.race.id;
           if (!raceId) { throw new Error('No valid race ID provided'); }
-          let key = `/races/${raceId}/timestamps/started`;
-          db.set(conn, key, Date.now()).then(resolve).catch(reject);
+          let key = `/races/${raceId}/timestamps/finished`;
+          db.set(conn, key, Date.now()).then(() => { resolve({}); }).catch(reject);
         }
       }
       catch (e) { reject(e); }

@@ -1,6 +1,6 @@
 (function () {
 
-  const config = require('./../config/config');
+  const config = require('./../config/config')({env: process.env});
   const db = require('./../modules/db')({config});
   const logger = require('./../modules/logger')({config});
   const common = require('./../modules/common');

@@ -5,7 +5,7 @@ module.exports = function (deps, conn, prevRace) {
       const common = deps.common;
       const db = deps.db;
       const Nightmare = deps.Nightmare;
-
+      
       common.crawl.getRaceInfo(deps)
       .then(race => {
         

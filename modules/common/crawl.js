@@ -30,7 +30,7 @@ module.exports = {
 
         let race = common.defaults.race();
 
-        Nightmare({show: false})
+        Nightmare({show: true})
         .goto(config.endpoints.yahoo.playerdistribution)
         .inject('js', './node_modules/jquery/dist/jquery.min.js')
         .evaluate((race) => {
@@ -77,26 +77,8 @@ module.exports = {
             }
 
             // get date & time of race
-            var parts = $('#nascar-live .race-date').text().trim().split(/[ :]/)
+            race.dateParts = $('#nascar-live .race-date').text().trim().split(/[ :]/)
               .map(x => x.replace(/[^\w\d]/, '')).filter(x => x !== '');
-
-            var today = new Date();
-            var year = today.getFullYear();
-            var month = race.date.split('/')[0] - 1;
-            var date = race.date.split('/')[1];
-            var hour = Number(parts[3]);
-            var minute = Number(parts[4]);
-
-            if (parts[5].toLowerCase() === 'pm') { hour += 12; }
-
-            var raceDateTime = new Date(year, month, date, hour, minute);
-
-            if (raceDateTime.getTime() < today.getTime()) {
-              raceDateTime = new Date(year+1, month, date, hour, minute);
-            }
-
-            race.timestamps.created = today.getTime();
-            race.timestamps.start = raceDateTime.getTime();
 
             // get car numbers
             $('.entryListDataTable .table-row').each(function (index, elem) {
@@ -113,7 +95,38 @@ module.exports = {
           }, race)
           .end()
           .then(race => {
-            if (race) { resolve(race); }
+            if (race) {
+
+              var today = new Date();
+              var dst = false;
+              var year = Number(today.getFullYear());
+              var month = Number(race.date.split('/')[0]) - 1;
+              var date = Number(race.date.split('/')[1]);
+              var hour = Number(race.dateParts[3]);
+              var minute = Number(race.dateParts[4]);
+
+              if (race.dateParts[6].toLowerCase() !== 'et' && race.dateParts[6].toLowerCase() !== 'est') {
+                throw new Error('could not get timezone offset');
+              }
+
+              if (race.dateParts[5].toLowerCase() === 'pm') { hour += 12; }
+              if (race.dateParts[6].toLowerCase() === 'et') { dst = true; }
+
+              var eastCoastUTCOffset; 
+              if (dst) {
+                eastCoastUTCOffset = 1000 * 60 * 60 * 4;
+              }
+              else {
+                eastCoastUTCOffset = 1000 * 60 * 60 * 5;
+              }
+              var raceDateTime = new Date(year, month, date, hour, minute);
+
+              race.raceDateTime = raceDateTime;
+              race.timestamps.created = Date.now();
+              race.timestamps.start = raceDateTime.getTime() + eastCoastUTCOffset;
+
+              resolve(race);
+            }
             else { reject(new Error('race data is not available')); }
           })
           .catch(reject);

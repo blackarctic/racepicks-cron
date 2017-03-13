@@ -1,6 +1,6 @@
 (function () {
 
-  const config = require('./config/config');
+  const config = require('./config/config')({env: process.env});
   const db = require('./modules/db')({config});
   const logger = require('./modules/logger')({config});
   const common = require('./modules/common');
@@ -58,7 +58,7 @@
               if (!data.alreadyExists) { logger.info('race marked as finished', data); }
               cycle(conn, THREE_DAYS);
             })
-            .catch(e => { logger.error(e); cycle(conn, TWENTY_FOUR_HOURS); });
+            .catch(e => { logger.error(e); cycle(conn, ONE_DAY); });
           }
         }
 
@@ -67,10 +67,10 @@
           // if not marked, mark the race as started
           common.db.markRaceAsStarted(deps, conn, {race: latestRace})
           .then(data => {
-            if (!data.alreadyExists) { logger.info('race marked as started', data); }
+            if (!data.alreadyExists) { logger.info('race marked as started', data); logger.info('begun monitoring race', data); }
             // monitor the race
             monitorRace(deps, conn, latestRace)
-            .then(data => { logger.info('begun monitoring race', data); cycle(conn, ONE_SECOND); })
+            .then(data => { cycle(conn, ONE_SECOND); })
             .catch(e => { logger.error(e); cycle(conn, FIVE_MINUTES); });
           })
           .catch(e => { logger.error(e); cycle(conn, FIVE_MINUTES); });

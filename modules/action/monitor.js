@@ -36,7 +36,7 @@ module.exports = function (deps, conn, latestRace) {
 
             // save the current lap data
             let lapNum = lap.lap_number;
-            common.db.saveLap(conn, data, {race: latestRace, lapNum})
+            common.db.saveLap(deps, conn, lap, {race: latestRace, lapNum})
             .then(() => resolve(lap))
             .catch(reject);
 
