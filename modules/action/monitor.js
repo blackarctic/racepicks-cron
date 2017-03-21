@@ -22,9 +22,11 @@ module.exports = function (deps, conn, latestRace) {
           
           // correctness checks
           let raceFromLap = {
-            name: lap.run_name,
-            date: latestRace.date,
-            track: lap.track_name
+            details: {
+              name: lap.run_name,
+              date: latestRace.details.date,
+              track: lap.track_name
+            }
           };
           if (!common.util.isSameRace(latestRace, raceFromLap)) {
             throw new Error('live race does not match the latest created race. no data saved.');

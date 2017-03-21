@@ -58,10 +58,21 @@ module.exports = function (deps) {
     });
   };
 
+  this.push = function (db, key, value) {
+    return new Promise(function (resolve, reject) {
+      try {
+        db.ref(key).push(value)
+        .then(function (response) { resolve(response); })
+        .catch(function (e) { reject(e); });
+      }
+      catch (e) { reject(e); }
+    });
+  };
+
   this.update = function (db, updates) {
     return new Promise(function (resolve, reject) {
       try {
-        db.ref(key).update(updates)
+        db.ref().update(updates)
         .then(function (response) { resolve(response); })
         .catch(function (e) { reject(e); });
       }

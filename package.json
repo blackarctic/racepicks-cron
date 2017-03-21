@@ -4,27 +4,23 @@
   "description": "",
   "main": "",
   "scripts": {
-
     "run-dev-local": ". ./.env/dev.sh && npm run start-dev-local",
     "start-dev-local": "node main.js",
     "start-dev-local-debug": "DEBUG=* node main.js",
-
     "build-dev": "docker build -t blackarctic/racepicks-cron -f ./Dockerfiles/dev/Dockerfile .",
     "run-dev": "docker stop racepicks-cron; docker rm racepicks-cron; . ./.env/dev.sh && docker run --name racepicks-cron --env-file ./.env/_keys.list blackarctic/racepicks-cron",
     "start-dev": "xvfb-run node main.js",
     "start-dev-debug": "DEBUG=* xvfb-run node main.js",
-
     "build-prod": "docker build -t blackarctic/racepicks-cron -f ./Dockerfiles/prod/Dockerfile .",
     "run-prod": "docker stop racepicks-cron; docker rm racepicks-cron; . ./.env/prod.sh && docker run -d --name racepicks-cron --restart always --env-file ./.env/_keys.list blackarctic/racepicks-cron",
     "start-prod": "xvfb-run node main.js",
-    
     "docker-prune": "docker rmi -f $(docker images -f \"dangling=true\" -q)",
-
     "wipe": ". ./.env/dev.sh && node scripts/wipe.js",
     "set": ". ./.env/dev.sh && node scripts/set.js",
     "get-drivers": ". ./.env/dev.sh && node scripts/get-drivers.js",
     "get-lap": ". ./.env/dev.sh && node scripts/get-lap.js",
-    
+    "add-entry": ". ./.env/dev.sh && node scripts/add-entry.js",
+    "set-details": ". ./.env/dev.sh && node scripts/set-details.js",
     "test": "mocha"
   },
   "author": "",
@@ -34,6 +30,7 @@
     "firebase": "^3.7.0",
     "jquery": "^3.1.1",
     "nightmare": "^2.10.0",
+    "prompt": "^1.0.0",
     "rollbar": "^0.6.3"
   },
   "devDependencies": {}

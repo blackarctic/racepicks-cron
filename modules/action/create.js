@@ -12,8 +12,8 @@ module.exports = function (deps, conn, prevRace) {
         // get race id if this is a new race
         let raceId;
         if (!prevRace) { raceId = 1; }
-        else if (!common.util.isSameRace(prevRace, race)) { raceId = prevRace.id + 1; }
-        else { throw new Error(`race not created. race already exists (${race.name} @ ${race.track})`); }
+        else if (!common.util.isSameRace(prevRace, race)) { raceId = prevRace.details.id + 1; }
+        else { throw new Error(`race not created. race already exists (${race.details.name} @ ${race.details.track})`); }
 
         // only grab the drivers who have numbers
         race.drivers.all = race.drivers.all.filter(function (driver) { return driver.num !== ''; });
@@ -22,7 +22,7 @@ module.exports = function (deps, conn, prevRace) {
         race.drivers.lists.c = race.drivers.lists.c.filter(function (driver) { return driver.num !== ''; });
 
         // set the race id
-        race.id = raceId;
+        race.details.id = raceId;
 
         // save the race in db
         common.db.saveRaceInfo(deps, conn, race)

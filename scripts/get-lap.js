@@ -13,12 +13,14 @@
       db.connect(config.server.firebase)
       .then(conn => {
 
-        common.db.getLatestRace({config, db, common, logger}, conn)
+        const lapNumArgError = new Error("No valid lap number argument provided");
+        if (process.argv.length < 3) { throw lapNumArgError; }
+        let lapNum = process.argv[2].trim().toLowerCase();
+
+        common.db.getLatestRace({config, db, common, logger}, conn, {lap: true, lapNum})
         .then(race => {
 
-          const lapNumArgError = new Error("No valid lap number argument provided");
-          if (process.argv.length < 3) { throw lapNumArgError; }
-          let lapNum = process.argv[2].trim().toLowerCase();
+          if (!race) { throw new Error(`race with lap ${lapNum} could not be found`); }
 
           const compareByPos = function (a, b) {
             return Number(a.running_position - b.running_position);

@@ -3,8 +3,8 @@ module.exports = {
   getLiveJsonUrl: function (deps, race) {
     return new Promise((resolve, reject) => {
       try {
-        if (race && race.liveJsonUrl) {
-          resolve(race.liveJsonUrl);
+        if (race && race.details && race.details.liveJsonUrl) {
+          resolve(race.details.liveJsonUrl);
         }
         else {
           const config = deps.config;
@@ -37,9 +37,9 @@ module.exports = {
 
           // get event info
           var eventInfo = $('#event-info');
-          race.name = eventInfo.find('h3').html().split('<em>')[0].trim();
-          race.date = eventInfo.find('h3 em').text().trim();
-          race.track = $('#event-details #venue p:nth-of-type(2)').text().trim();
+          race.details.name = eventInfo.find('h3').html().split('<em>')[0].trim();
+          race.details.date = eventInfo.find('h3 em').text().trim();
+          race.details.track = $('#event-details #venue p:nth-of-type(2)').text().trim();
 
           // get drivers
           var aListTable = $('.data-table:nth-of-type(1)');
@@ -72,12 +72,12 @@ module.exports = {
 
             // check that nascar.com and yahoo.com are both on the same race
             var track = $('#nascar-live .race-details .race-name').text();
-            if (race.track !== track) { 
+            if (race.details.track.split(' ')[0] !== track.split(' ')[0]) { 
               return null;
             }
 
             // get date & time of race
-            race.dateParts = $('#nascar-live .race-date').text().trim().split(/[ :]/)
+            race.details.dateParts = $('#nascar-live .race-date').text().trim().split(/[ :]/)
               .map(x => x.replace(/[^\w\d]/, '')).filter(x => x !== '');
 
             // get car numbers
@@ -100,17 +100,17 @@ module.exports = {
               var today = new Date();
               var dst = false;
               var year = Number(today.getFullYear());
-              var month = Number(race.date.split('/')[0]) - 1;
-              var date = Number(race.date.split('/')[1]);
-              var hour = Number(race.dateParts[3]);
-              var minute = Number(race.dateParts[4]);
+              var month = Number(race.details.date.split('/')[0]) - 1;
+              var date = Number(race.details.date.split('/')[1]);
+              var hour = Number(race.details.dateParts[3]);
+              var minute = Number(race.details.dateParts[4]);
 
-              if (race.dateParts[6].toLowerCase() !== 'et' && race.dateParts[6].toLowerCase() !== 'est') {
+              if (race.details.dateParts[6].toLowerCase() !== 'et' && race.details.dateParts[6].toLowerCase() !== 'est') {
                 throw new Error('could not get timezone offset');
               }
 
-              if (race.dateParts[5].toLowerCase() === 'pm') { hour += 12; }
-              if (race.dateParts[6].toLowerCase() === 'et') { dst = true; }
+              if (race.details.dateParts[5].toLowerCase() === 'pm') { hour += 12; }
+              if (race.details.dateParts[6].toLowerCase() === 'et') { dst = true; }
 
               var eastCoastUTCOffset; 
               if (dst) {
@@ -121,13 +121,12 @@ module.exports = {
               }
               var raceDateTime = new Date(year, month, date, hour, minute);
 
-              race.raceDateTime = raceDateTime;
-              race.timestamps.created = Date.now();
-              race.timestamps.start = raceDateTime.getTime() + eastCoastUTCOffset;
+              race.details.timestamps.created = Date.now();
+              race.details.timestamps.start = raceDateTime.getTime() + eastCoastUTCOffset;
 
               resolve(race);
             }
-            else { reject(new Error('race data is not available')); }
+            else { reject(new Error('race could not be created. race data is not available')); }
           })
           .catch(reject);
         })

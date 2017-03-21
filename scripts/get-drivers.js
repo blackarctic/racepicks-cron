@@ -13,8 +13,10 @@
       db.connect(config.server.firebase)
       .then(conn => {
 
-        common.db.getLatestRace({config, db, common, logger}, conn)
+        common.db.getLatestRace({config, db, common, logger}, conn, {drivers: true})
         .then(race => {
+
+          if (!race) { throw new Error('race with drivers could not be found'); }
 
           const compareByNum = function compare(a, b) {
             if (Number(a.num) < Number(b.num)) { return -1; }
