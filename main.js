@@ -32,7 +32,7 @@
         logger.debug('got latest race', latestRace);
 
         // if there is no race
-        if (!latestRace) {
+        if (!latestRace || !latestRace.details) {
           // create the race
           let prevRace = latestRace;
           createRace(deps, conn, prevRace)

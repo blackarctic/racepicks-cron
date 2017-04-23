@@ -43,7 +43,7 @@ module.exports = {
           if (raceDetails) { race.details = raceDetails; }
           if (raceLive) { race.live = raceLive; }
           if (raceDrivers) { race.drivers = raceDrivers; }
-          if (raceLap) { race.laps[lapNum] = raceLap; }
+          if (raceLap) { race.laps = []; race.laps[lapNum] = raceLap; }
 
           resolve(race);
 
@@ -126,7 +126,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       try {
         const db = deps.db;
-        let raceId = data.id;
+        let raceId = data.details.id;
         if (!raceId) { throw new Error('No valid race ID provided'); }
         let key = `/latestRaceId`;
         db.set(conn, key, raceId).then(() => {

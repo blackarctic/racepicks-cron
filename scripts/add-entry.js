@@ -35,6 +35,13 @@
               type: 'string',
               default: 'user',
               required: false,
+            },
+            {
+              name: 'color',
+              description: 'Color',
+              type: 'string',
+              default: 'black',
+              required: false,
               before: val => { console.log('\n'); return val; }
             },
 

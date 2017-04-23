@@ -8,10 +8,10 @@ module.exports = {
         date: '',
         dateParts: {},
         track: '',
-        liveJSONUrl: "",
+        liveJSONUrl: '',
         segments: {
           first: 0,
-          second: 0, 
+          second: 0,
         },
         timestamps: {
           created: null,
@@ -21,15 +21,15 @@ module.exports = {
         },
         tossups: {
           high: {
-            prompt: 'None'
+            prompt: 'None',
             answer: 'None'
           },
           max: {
-            prompt: 'None'
+            prompt: 'None',
             answer: 'None'
           },
           extreme: {
-            prompt: 'None'
+            prompt: 'None',
             answer: 'None'
           },
         },
@@ -49,6 +49,7 @@ module.exports = {
       },
       laps: {},
       live: {},
+      entries: {},
     };
   },
   

@@ -11,7 +11,7 @@ module.exports = function (deps, conn, prevRace) {
         
         // get race id if this is a new race
         let raceId;
-        if (!prevRace) { raceId = 1; }
+        if (!prevRace || !prevRace.details) { raceId = 1; }
         else if (!common.util.isSameRace(prevRace, race)) { raceId = prevRace.details.id + 1; }
         else { throw new Error(`race not created. race already exists (${race.details.name} @ ${race.details.track})`); }
 

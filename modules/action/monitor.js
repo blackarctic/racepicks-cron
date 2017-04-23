@@ -8,7 +8,7 @@ module.exports = function (deps, conn, latestRace) {
       const Nightmare = deps.Nightmare;
 
       // sanity checks
-      if (!latestRace) { throw new Error('no race exists in the db. the race must be created first.'); }
+      if (!latestRace || !latestRace.details) { throw new Error('no race exists in the db. the race must be created first.'); }
       
       // get the url for the the live race json
       common.crawl.getLiveJsonUrl(deps, latestRace)
